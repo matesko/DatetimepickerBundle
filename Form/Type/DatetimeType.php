@@ -67,17 +67,25 @@ class DatetimeType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $configs = $this->options;
-        
+        $defPickerOptions = is_array($configs['pickerOptions']) ? $configs['pickerOptions'] : array();
+        // $a = array(
+        //         'widget' => 'single_text',
+        //         'format' => DatetimeType::convertMalotToIntlFormater( $configs['pickerOptions']['format'] ),
+        //         'pickerOptions' => $defPickerOptions,
+        //     );
+        // ~r(json_encode($a));
         $resolver
             ->setDefaults(array(
                 'widget' => 'single_text',
                 'format' => function (Options $options, $value) use ($configs) {
-                    if(isset($options['pickerOptions']['format']))
-                        return DatetimeType::convertMalotToIntlFormater( $options['pickerOptions']['format'] );
-                    else
+                    if(isset($configs['pickerOptions']['format'])) {
+                        return DatetimeType::convertMalotToIntlFormater( $configs['pickerOptions']['format'] );
+                    }
+                    else {
                         return DatetimeType::convertMalotToIntlFormater( 'mm/dd/yyyy HH:ii' );
+                    }
                 },
-                'pickerOptions' => array(),
+                'pickerOptions' => $defPickerOptions,
             ));
     }
 
