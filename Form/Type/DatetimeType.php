@@ -51,7 +51,7 @@ class DatetimeType extends AbstractType
 
         //Set the defaut format of malot.fr/bootstrap-datetimepicker
         if (!isset($options['format'])) {
-            $pickerOptions['format'] = 'mm/dd/yyyy HH:ii';
+            $pickerOptions['format'] = 'dd.mm.yyyy hh:ii';
         } else {
             $pickerOptions['format'] = $options['format'];
         }
