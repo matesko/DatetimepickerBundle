@@ -19,41 +19,42 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType as BaseDateType;
 
 /**
-* DatetimeType
-*
-*/
+ * DatetimeType
+ *
+ */
 class DatetimeType extends AbstractType
 {
     private $options;
 
     /**
-    * Constructs
-    *
-    * @param array $options
-    */
+     * Constructs
+     *
+     * @param array $options
+     */
     public function __construct(array $options)
     {
         $this->options = $options;
-        
+
     }
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        
         $pickerOptions = $options['pickerOptions'];
-
         //Set automatically the language
-        if(!isset($options['pickerOptions']['language']))
+        if (!isset($options['pickerOptions']['language']))
             $pickerOptions['language'] = \Locale::getDefault();
-        if($pickerOptions['language'] == 'en')
+        if ($pickerOptions['language'] == 'en')
             unset($pickerOptions['language']);
-        
+
         //Set the defaut format of malot.fr/bootstrap-datetimepicker
-        if(!isset($options['pickerOptions']['format']))
+        if (!isset($options['format'])) {
             $pickerOptions['format'] = 'mm/dd/yyyy HH:ii';
+        } else {
+            $pickerOptions['format'] = $options['format'];
+        }
 
 
         $view->vars = array_replace($view->vars, array(
@@ -62,39 +63,40 @@ class DatetimeType extends AbstractType
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $configs = $this->options;
-        
         $resolver
             ->setDefaults(array(
                 'widget' => 'single_text',
                 'format' => function (Options $options, $value) use ($configs) {
-                    if(isset($options['pickerOptions']['format']))
-                        return DatetimeType::convertMalotToIntlFormater( $options['pickerOptions']['format'] );
-                    else
-                        return DatetimeType::convertMalotToIntlFormater( 'mm/dd/yyyy HH:ii' );
+                    if (isset($configs['pickerOptions']['format'])) {
+                        return DatetimeType::convertMalotToIntlFormater($configs['pickerOptions']['format']);
+                    } else {
+                        return DatetimeType::convertMalotToIntlFormater('dd.mm.yyyy hh:ii');
+                    }
                 },
                 'pickerOptions' => array(),
-            ));
+            ))
+        ;
     }
 
     /**
-    * Convert the Bootstrap Datetimepicker date format to PHP date format
-    */
+     * Convert the Bootstrap Datetimepicker date format to PHP date format
+     */
     public static function convertMalotToIntlFormater($formatter)
     {
-        $malotFormater  =  array("yyyy", "ss", "ii", "hh", "HH", "dd", "mm", "MM",   "yy");
-        $intlFormater   =  array("yyyy", "ss", "mm", "HH", "hh", "dd", "MM", "MMMM", "yy");
+        $malotFormater = array("yyyy", "ss", "ii", "hh", "HH", "dd", "mm", "MM", "yy");
+        $intlFormater = array("yyyy", "ss", "mm", "HH", "hh", "dd", "MM", "MMMM", "yy");
         $return = str_replace($malotFormater, $intlFormater, $formatter);
-        
-        $malotFormater  =  array("p", "P", "s", "i", "h", "H", "d", "m", "M");
-        $intlFormater   =  array("a", "a", "s", "m", "H", "h", "d", "M", "MMM");
+
+        $malotFormater = array("p", "P", "s", "i", "h", "H", "d", "m", "M");
+        $intlFormater = array("a", "a", "s", "m", "H", "h", "d", "M", "MMM");
         $return = str_replace($malotFormater, $intlFormater, $return);
-        
-        
+
+
         $patterns = preg_split('([\\\/.:_;,\s-\ ]{1})', $formatter);
         $exits = array();
 
@@ -149,27 +151,26 @@ class DatetimeType extends AbstractType
                 case 'M':
                     $exits[$val] = 'MMM';
                     break;
-                
+
             }
         }
 
         return str_replace(array_keys($exits), array_values($exits), $formatter);
-        
+
     }
 
-    
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'datetime';
     }
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'collot_datetime';
