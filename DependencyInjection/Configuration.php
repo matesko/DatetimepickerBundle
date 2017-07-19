@@ -44,6 +44,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('configs')
                             ->addDefaultsIfNotSet()
                             ->children()
+                                ->scalarNode('format')->end()
                                 ->enumNode('formatter')->defaultValue('js')
                                     ->values(array('js', 'php'))
                                 ->end()
